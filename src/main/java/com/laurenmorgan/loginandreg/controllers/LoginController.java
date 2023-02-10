@@ -79,7 +79,15 @@ public class LoginController {
              model.addAttribute("newUser", new User());
              return "index.jsp";
          }
-        
+         
+         
+         if(!BCrypt.checkpw(newLogin.getPassword(), user.getPassword())) {
+        	    result.rejectValue("password", "Matches", "Invalid Password!");
+        	    return "index.jsp";
+        	}
+         else {
+        	 session.setAttribute("userId", user.getId());
+         }
          
      
          // No errors! 

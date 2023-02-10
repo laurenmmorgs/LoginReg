@@ -21,15 +21,18 @@ public class UserService {
 	   
 	    public User register(User newUser, BindingResult result) {
 	       
-	    	String passwordEntered = newUser.getPassword();
 	    	// TO-DO - Reject values or register if no errors:
 	    	if(result.hasErrors()) {
 	    		return null;
 	    	}
+	    	
 	    	// Reject if email is taken (present in database)
 	    	Optional<User> potentialUser = userRepo.findByEmail(newUser.getEmail());
-	    	if(newUser.getEmail().equals(potentialUser.isPresent())) {
+	    	
+	    	
+	    	if(potentialUser.isPresent()) {
 	    		result.rejectValue("email", "email", "This email already exists");
+	    		return null;
 	    	}
 	    	// Reject if password doesn't match confirmation
 	    	if(!newUser.getPassword().equals(newUser.getConfirm())) {
@@ -61,18 +64,23 @@ public class UserService {
 	    	
 	    	// Find user in the DB by email
 	    	Optional<User> potentialUser = userRepo.findByEmail(newLoginObject.getEmail());
-	    	// Reject if NOT present
-	    	if(newLoginObject.getEmail().equals(potentialUser.isPresent())) {
-	    		result.rejectValue("email", "email", "This email already exists");
-	    	}
-	    	potentialUser.isPresent();
 	    	
-	    	if(!BCrypt.checkpw(newLoginObject.getPassword(), potentialUser.getPassword())) {
-	    	    result.rejectValue("password", "Matches", "Invalid Password!");
+	    	// Reject if NOT present
+	    	if(!potentialUser.isPresent()) {
+	    		result.rejectValue("email", "email", "This user does not exist.");
+	    		return null;
 	    	}
+	    	
+	    	if(!newLoginObject.getPassword().equals(newLoginObject.getPassword())) {
+	    	    result.rejectValue("confirm", "Matches", "The Confirm Password must match Password!");
+	    	    return null;
+	    	}
+	    	
 	    
-			
-	        
+	    	
+	    
+	    	
+	   
 	        // Reject if BCrypt password match fails
 	    
 	        // Return null if result has errors
